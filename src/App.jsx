@@ -13,12 +13,13 @@ class App extends Component {
 
         let board = [];
 
-        for ( let y=0; y<props.rows; y++ ) {
+        for ( let x=0; x<props.rows; x++ ) {
             board.push([]);
-            for ( let x=0; x<props.columns; x++ ) {
-                board[y].push({
+            for ( let y=0; y<props.columns; y++ ) {
+                board[x].push({
                     "imageColor": "white",
                     "imageName": "blank",
+                    "movementCost": 1,
                     "x": x,
                     "y": y
                 });
@@ -28,24 +29,82 @@ class App extends Component {
         board[0][0] = {
             "imageColor": "white",
             "imageName": "target",
+            "movementCost": 1,
             "x": 0,
             "y": 0
         };
 
-        board[69][69] = {
+
+        board [5][5] = {
             "imageColor": "white",
-            "imageName": "goblin",
-            "x": 69,
-            "y": 69
+            "imageName": "stump",
+            "movementCost": false,
+            "x": 5,
+            "y": 5
         };
 
-		board[20][40] = {
-			"imageColor": "white",
-			"imageName": "goblin",
-			"x": 20,
-			"y": 40
-		};
+        board [4][6] = {
+            "imageColor": "white",
+            "imageName": "stump",
+            "movementCost": false,
+            "x": 4,
+            "y": 6
+        };
 
+        board [6][4] = {
+            "imageColor": "white",
+            "imageName": "stump",
+            "movementCost": false,
+            "x": 6,
+            "y": 4
+        };
+
+
+        board [7][3] = {
+            "imageColor": "white",
+            "imageName": "stump",
+            "movementCost": false,
+            "x": 6,
+            "y": 4
+        };
+
+        board [3][7] = {
+            "imageColor": "white",
+            "imageName": "stump",
+            "movementCost": false,
+            "x": 6,
+            "y": 4
+        };
+        for (let i=0; i<3; i++) {
+            for (let j=0; j<3; j++) {
+                board [i][7+j] = {
+                    "imageColor": "white",
+                    "imageName": "swamp",
+                    "movementCost": 3,
+                    "x": i,
+                    "y": 7+j
+                };
+            }
+        }
+
+
+        /*for (let i=0; i<8; i++) {
+            board [7][i] = {
+                "imageColor": "white",
+                "imageName": "stump",
+                "movementCost": false,
+                "x": 7,
+                "y": i
+            };
+
+            board [9][i] = {
+                "imageColor": "white",
+                "imageName": "stump",
+                "movementCost": false,
+                "x": 9,
+                "y": i
+            };
+        }*/
 
         this.state = {
             "targets": [
@@ -57,24 +116,9 @@ class App extends Component {
             "board": board
         };
 
+        this.moveGoblins = this.moveGoblins.bind(this);
         this.createGoblin = this.createGoblin.bind(this);
         this.getNeighbors = this.getNeighbors.bind(this);
-    }
-
-    componentDidMount() {
-        this.moveGoblins();
-    }
-
-    findREEEEE() {
-
-        for ( let x=0; x<this.props.rows; x++ ) {
-            for ( let y=0; y<this.props.columns; y++ ) {
-                if (this.state.board[x][y].imageName === "REEEEEE") {
-                    console.log(this.state.board[x][y]);
-                }
-            }
-        }
-
     }
 
 
@@ -123,24 +167,24 @@ class App extends Component {
                     this.state.board[ x ][ y ],
                     this.state.board[ this.state.targets[0].x ][ this.state.targets[0].y ]
                 );
-                newGoblins.push(newGoblinPos);
+
+                //if unable to find path don't move
+                if (newGoblinPos === false) {
+                    newGoblins.push({"x": x, "y": y});
+                } else {
+                    newGoblins.push(newGoblinPos);
+                }
             } else {
                 board[x][y].imageName = "blank";
             }
 
         }
 
-
         for (let i=0;i<goblins.length;i++) {
         	board[goblins[i].x][goblins[i].y].imageName = "blank";
             board[newGoblins[i].x][newGoblins[i].y].imageName = "goblin";
         }
         this.setState({board: board});
-
-        setTimeout(
-            this.moveGoblins.bind(this),
-            500
-        );
 
     }
 
@@ -175,20 +219,23 @@ class App extends Component {
 			}
 
             let current = frontier.pop();
+        	if (current === undefined ) {
+        	    return false;
+            }
             let currentId = "X" + current.x + "Y" + current.y;
 
             if ( current.x === to.x && current.y === to.y ) {
                 break;
             }
 
-            let neighbors = this.getNeighbors(current);
+            let neighbors = this.getMoveableNeighbors(current);
 
             Object.keys(neighbors).forEach( (key, index) => {
                 let currentNeighbor = neighbors[key];
 
                 let neighborKey = "X" + currentNeighbor.x + "Y" + currentNeighbor.y;
 
-                let newCost = costSoFar[currentId] + 1;
+                let newCost = costSoFar[currentId] + currentNeighbor.movementCost;
 
                 //if you dont already have a cost, or the new cost is smaller than the current cost, use this path
                 if ( costSoFar[neighborKey] === undefined || newCost < costSoFar[neighborKey] ) {
@@ -251,6 +298,29 @@ class App extends Component {
 
     }
 
+    getMoveableNeighbors(position) {
+
+        let neighbors = {};
+        let x = parseInt(position.x);
+        let y = parseInt(position.y);
+
+        if ( x - 1 >= 0 && this.state.board[x-1][y].movementCost !== false) {
+            neighbors.left = this.state.board[x-1][y];
+        }
+        if ( x + 1 < this.props.columns && this.state.board[x+1][y].movementCost !== false ) {
+            neighbors.right = this.state.board[x+1][y];
+        }
+        if ( y - 1 >= 0  && this.state.board[x][y-1].movementCost !== false) {
+            neighbors.top = this.state.board[x][y-1];
+        }
+        if ( y + 1 < this.props.rows  && this.state.board[x][y+1].movementCost !== false) {
+            neighbors.bottom = this.state.board[x][y+1];
+        }
+
+        return lodash.cloneDeep(neighbors);
+
+    }
+
     determineDistanceBetweenTiles(pos1, pos2) {
         let xDistance = Math.pow((pos1.x - pos2.x), 2);
         let yDistance = Math.pow((pos1.y - pos2.y), 2);
@@ -269,28 +339,30 @@ class App extends Component {
         return Math.floor((Math.random() * 100) + 1);
     }
 
-    createGoblin(squareIndex) {
+    createGoblin(x, y) {
 
-        let tempState = Object.assign({}, this.state.board, {});
+        let tempState = Object.assign({}, this.state, {});
 
-        tempState[squareIndex] = {
-            "imageName": "goblin",
-            "imageColor": "blue"
-        };
+        console.log("X: " + x);
+        console.log("Y: " + y);
 
-        this.setState({board: tempState});
+        tempState.board[x][y].imageName = "goblin";
+
+        console.log(tempState);
+
+        this.setState(tempState);
     }
 
     render() {
         return (
             <div>
-            <Board
-                columns={this.props.columns}
-                rows={this.props.columns}
-                board={this.state.board}
-                clickFunction={function() {console.log(this)}}
-            />
-            <button onClick={this.findREEEEE}>REEEEEEEEE</button>
+                <Board
+                    columns={this.props.columns}
+                    rows={this.props.columns}
+                    board={this.state.board}
+                    clickFunction={this.createGoblin}
+                />
+                <button onClick={this.moveGoblins}>End Turn</button>
             </div>
         );
     }
