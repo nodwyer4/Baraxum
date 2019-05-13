@@ -18,7 +18,7 @@ let images = {
 
 import SquareCss from "./Square.css";
 
-class Square extends React.Component {
+export class Square extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -42,5 +42,3 @@ class Square extends React.Component {
     );
   }
 }
-
-export default Square;

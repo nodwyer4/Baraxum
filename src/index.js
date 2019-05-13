@@ -1,8 +1,18 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import './App.css';
-import App from './App.jsx';
-import registerServiceWorker from './registerServiceWorker';
+import { render } from 'react-dom';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
+import rootReducer from './reducers';
+import App from './containers/app';
 
-ReactDOM.render(<App columns={10} rows={10}/>, document.getElementById('index'));
+const store = createStore(rootReducer);
+
+render(
+    <Provider store={store}>
+        <App />
+    </Provider>,
+    document.getElementById('index')
+);
+
+import registerServiceWorker from './registerServiceWorker';
 registerServiceWorker();
