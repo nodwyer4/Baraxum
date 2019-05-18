@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Square } from "./square/square.jsx";
-import BoardCSS from "../CSS/Board.css";
+import BoardCSS from "../CSS/Board.module.css";
 
 import PropTypes from 'prop-types';
 

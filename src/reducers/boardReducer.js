@@ -1,7 +1,7 @@
 //import {  } from "../constants/ActionTypes";
 
-const width = Math.floor((Math.random() * 10) + 1);
-const height = Math.floor((Math.random() * 10) + 1);
+const width = Math.floor((Math.random() * 30) + 1);
+const height = Math.floor((Math.random() * 30) + 1);
 
 function generateDefaultBoard(width, height) {
 

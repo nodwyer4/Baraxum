@@ -7,6 +7,8 @@ import graphite from "../../images/sprites/graphite.png";
 import stump from "../../images/sprites/stump.png";
 import dirt from "../../images/sprites/dirt.png";
 
+import SquareCss from "./Square.module.css";
+
 let images = {
   "blank": blank,
   "goblin": goblin,
@@ -16,7 +18,6 @@ let images = {
   "dirt": dirt,
 }
 
-import SquareCss from "./Square.css";
 
 export class Square extends React.Component {
   constructor(props) {

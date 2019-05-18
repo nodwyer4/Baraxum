@@ -6,7 +6,7 @@ const ClosurePlugin = require("closure-webpack-plugin");
 module.exports = {
 	entry: "./src/index.js",
 	output: {
-		path: path.resolve("dist"),
+		path: path.resolve("build"),
 		filename: "bundled.js"
 	},
 	module: {
@@ -20,9 +20,7 @@ module.exports = {
 			},
 			{
 				test: /\.html$/,
-				use: [
-					"html-loader"
-				]
+				use: "html-loader",
 			},
 			{
 				test: /\.css$/,
@@ -54,12 +52,5 @@ module.exports = {
 			template: "./src/index.html",
 			filename: "./index.html"
 		})
-	],
-	optimization: {
-		minimizer: [
-			new ClosurePlugin({mode: "STANDARD"}, {
-
-			})
-		]
-	}
+	]
 };
